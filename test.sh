@@ -5,6 +5,8 @@ thisdir=$(dirname ${BASH_SOURCE[0]})
 source "${thisdir}/constants.sh"
 source "${thisdir}/os.sh"
 
+use_stdin="${use_stdin:-"true"}"
+
 dirty="false"
 for arg in "$@" ; do
 	#echo $arg
@@ -77,7 +79,12 @@ for i in ${inputs}; do
 	ntotal=$((ntotal + 1))
 	failed="false"
 
-	"${pwd}/${exe}" < "$ib"
+	if [[ "$use_stdin" == "true" ]]; then
+		"${pwd}/${exe}" < "$ib"
+	else
+		"${pwd}/${exe}" "$ib"
+	fi
+
 	if [[ "$?" != "0" ]]; then
 		failed="true"
 		echo "$this:  error:  cannot run test $i"
