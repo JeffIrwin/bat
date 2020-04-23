@@ -6,7 +6,7 @@ BAT:  a cross-platform Bourne-again testing framework for a novel world rising f
 For complete projects that use the BAT framework, see [life](https://github.com/JeffIrwin/life) or [mandelbrotZoom](https://github.com/JeffIrwin/mandelbrotZoom).
 
 ### Building
-Before you test, you have to build, right?  BAT automatically builds using CMake for you before testing, but you can also build independently from testing.  From the parent repo, run:
+Before you test, you have to build, right?  BAT automatically builds for you using CMake before testing, but you can also build independently from testing.  From the parent repo, run:
 
     ./path/to/bat/build.sh
 
