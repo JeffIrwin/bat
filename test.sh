@@ -52,6 +52,7 @@ nfail=0
 ntotal=0
 nfailframes=0
 ntotalframes=0
+failedtests=()
 
 for i in ${inputs}; do
 
@@ -112,6 +113,7 @@ for i in ${inputs}; do
 	fi
 
 	if [[ "$failed" == "true" ]]; then
+		failedtests+=("$i")
 		nfail=$((nfail + 1))
 	fi
 
@@ -129,6 +131,13 @@ echo "$this:  done!"
 echo ""
 
 if [[ "$nfail" != "0" ]]; then
+	echo "$this:  failed test(s):"
+	echo "["
+	for ftest in ${failedtests[@]} ; do
+		echo "	$ftest"
+	done
+	echo "]"
+	echo ""
 	echo "$this:  error:  not all tests passed"
 fi
 
