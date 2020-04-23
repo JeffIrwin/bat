@@ -46,6 +46,8 @@ Sometimes you can't be sure unless you remove the old build first.  From the par
 
     ./path/to/bat/clean.sh
 
+Want to test quickly without cleaning?  Run `test.sh --dirty` or `test.sh -d`.
+
 Cleaning and building are trivial one-liners, but the example projects [life](https://github.com/JeffIrwin/life) and [mandelbrotZoom](https://github.com/JeffIrwin/mandelbrotZoom) still provide wrapper scripts for these actions, as well as testing.
 
 ## FAQ
