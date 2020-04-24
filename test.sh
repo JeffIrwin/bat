@@ -79,7 +79,7 @@ for i in ${inputs}; do
 	inputext=${ib##*.}
 
 	outputs=()
-	if [[ "${#errors[@]}" == "0" ]]; then
+	if [[ "${#frames[@]}" == "0" ]]; then
 		# No numbered frames, just a single output
 		outputs+=( "${outdir}/${ib%.${inputext}}.${outputext}" )
 	else
