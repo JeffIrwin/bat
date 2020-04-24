@@ -40,7 +40,7 @@ fi
 pwd=$(pwd)
 
 if [[ "$use_python" == "true" ]]; then
-	if [[ "$machine" == "Linux" ]]; then
+	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
 		python="python3"
 	else
 		python="python"
