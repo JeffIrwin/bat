@@ -40,7 +40,12 @@ fi
 pwd=$(pwd)
 
 if [[ "$use_python" == "true" ]]; then
-	exe="python $pwd/$exebase.py"
+	if [[ "$machine" == "Linux" ]]; then
+		python="python3"
+	else
+		python="python"
+	fi
+	exe="$python $pwd/$exebase.py"
 else
 
 	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
