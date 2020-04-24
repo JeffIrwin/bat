@@ -6,6 +6,7 @@ source "${thisdir}/constants.sh"
 source "${thisdir}/os.sh"
 
 use_stdin="${use_stdin:-"true"}"
+use_python="${use_python:-"false"}"
 
 dirty="false"
 for arg in "$@" ; do
@@ -18,29 +19,41 @@ for arg in "$@" ; do
 	fi
 done
 
-if [[ "$dirty" != "true" ]]; then
-	chmod +x "${thisdir}/clean.sh"
-	"${thisdir}/clean.sh"
-fi
+if [[ "$use_python" != "true" ]]; then
 
-chmod +x "${thisdir}/build.sh"
-"${thisdir}/build.sh"
-if [[ "$?" != "0" ]]; then
-	echo "$this:  error:  cannot build"
-	exit -1
+	# No CMake for interpreted python
+
+	if [[ "$dirty" != "true" ]]; then
+		chmod +x "${thisdir}/clean.sh"
+		"${thisdir}/clean.sh"
+	fi
+
+	chmod +x "${thisdir}/build.sh"
+	"${thisdir}/build.sh"
+	if [[ "$?" != "0" ]]; then
+		echo "$this:  error:  cannot build"
+		exit -1
+	fi
+
 fi
 
 pwd=$(pwd)
 
-if [[ $machine == "Linux" || $machine == "Mac" ]]; then
-	exe="./$build/$exebase"
+if [[ "$use_python" == "true" ]]; then
+	exe="python $pwd/$exebase.py"
 else
-	exe="./$build/$exebase.exe"
-fi
 
-if [[ ! -e "$exe" ]]; then
-	echo "$this:  error:  executable \"$exe\" does not exist"
-	exit -2
+	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
+		exe="$pwd/$build/$exebase"
+	else
+		exe="$pwd/$build/$exebase.exe"
+	fi
+
+	if [[ ! -e "$exe" ]]; then
+		echo "$this:  error:  executable \"$exe\" does not exist"
+		exit -2
+	fi
+
 fi
 
 echo "==============================================================================="
@@ -61,12 +74,17 @@ for i in ${inputs}; do
 	inputext=${ib##*.}
 
 	outputs=()
-	for frame in ${frames[@]}; do
-		# This makes an assumption about where the frame number is in the
-		# filename and how it is delimited.  For projects like fortfuck, check
-		# if frames is empty and don't use a delimiter.
-		outputs+=( "${outdir}/${ib%.${inputext}}_${frame}.${outputext}" )
-	done
+	if [[ "${#errors[@]}" == "0" ]]; then
+		# No numbered frames, just a single output
+		outputs+=( "${outdir}/${ib%.${inputext}}.${outputext}" )
+	else
+		for frame in ${frames[@]}; do
+			# This makes an assumption about where the frame number is in the
+			# filename and how it is delimited.  For projects like fortfuck, check
+			# if frames is empty and don't use a delimiter.
+			outputs+=( "${outdir}/${ib%.${inputext}}_${frame}.${outputext}" )
+		done
+	fi
 
 	#echo "i   = $i"
 	#echo "ib  = $ib"
@@ -81,9 +99,9 @@ for i in ${inputs}; do
 	failed="false"
 
 	if [[ "$use_stdin" == "true" ]]; then
-		"${pwd}/${exe}" < "$ib"
+		${exe} < "$ib"
 	else
-		"${pwd}/${exe}" "$ib"
+		${exe} "$ib"
 	fi
 
 	if [[ "$?" != "0" ]]; then
