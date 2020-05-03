@@ -54,7 +54,13 @@ else
 	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
 		exe="$pwd/$build/$exebase"
 	else
-		exe="$pwd/$build/$exebase.exe"
+
+		if [[ "$use_defaultgen" == "true" ]]; then
+			exe="$pwd/$build/Release/$exebase.exe"
+		else
+			exe="$pwd/$build/$exebase.exe"
+		fi
+
 	fi
 
 	if [[ ! -e "$exe" ]]; then
