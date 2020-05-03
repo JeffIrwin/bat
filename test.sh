@@ -6,6 +6,7 @@ source "${thisdir}/constants.sh"
 source "${thisdir}/os.sh"
 
 use_stdin="${use_stdin:-"true"}"
+use_pushpop="${use_pushpop:-"true"}"
 use_python="${use_python:-"false"}"
 
 dirty="false"
@@ -22,6 +23,8 @@ done
 if [[ "$use_python" != "true" ]]; then
 
 	# No CMake for interpreted python
+
+	export use_defaultgen
 
 	if [[ "$dirty" != "true" ]]; then
 		chmod +x "${thisdir}/clean.sh"
@@ -98,15 +101,20 @@ for i in ${inputs}; do
 
 	rm "${outputs[@]}"
 
-	pushd $d
+	if [[ "$use_pushpop" == "true" ]]; then
+		pushd $d
+		il=$ib
+	else
+		il=$i
+	fi
 
 	ntotal=$((ntotal + 1))
 	failed="false"
 
 	if [[ "$use_stdin" == "true" ]]; then
-		${exe} < "$ib"
+		${exe} < "$il"
 	else
-		${exe} "$ib"
+		${exe} "$il"
 	fi
 
 	if [[ "$?" != "0" ]]; then
@@ -114,7 +122,9 @@ for i in ${inputs}; do
 		echo "$this:  error:  cannot run test $i"
 	fi
 
-	popd
+	if [[ "$use_pushpop" == "true" ]]; then
+		popd
+	fi
 
 	if [[ "$failed" != "true" ]]; then
 		for output in ${outputs[@]}; do

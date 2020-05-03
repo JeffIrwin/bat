@@ -6,6 +6,8 @@ thisdir=$(dirname ${BASH_SOURCE[0]})
 source "${thisdir}/constants.sh"
 source "${thisdir}/os.sh"
 
+use_defaultgen="${use_defaultgen:-"false"}"
+
 BTYPE=Release
 
 for arg in "$@" ; do
@@ -33,7 +35,7 @@ else
 fi
 
 # CMake runs from the top-level folder
-if [[ "$machine" == "MinGw" ]]; then
+if [[ "$machine" == "MinGw" && "$use_defaultgen" != "true" ]]; then
 	"$CMAKE" .. -DCMAKE_BUILD_TYPE=$BTYPE -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -G "MSYS Makefiles"
 else
 	"$CMAKE" .. -DCMAKE_BUILD_TYPE=$BTYPE -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
