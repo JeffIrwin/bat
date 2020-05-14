@@ -92,7 +92,7 @@ for i in ${inputs}; do
 		# No numbered frames, just a single output
 		outputs+=( "${outdir}/${ib%.${inputext}}.${outputext}" )
 	else
-		for frame in ${frames[@]}; do
+		for frame in "${frames[@]}"; do
 			# This makes an assumption about where the frame number is in the
 			# filename and how it is delimited.  For projects like fortfuck, check
 			# if frames is empty and don't use a delimiter.
@@ -133,10 +133,10 @@ for i in ${inputs}; do
 	fi
 
 	if [[ "$failed" != "true" ]]; then
-		for output in ${outputs[@]}; do
+		for output in "${outputs[@]}"; do
 			ntotalframes=$((ntotalframes + 1))
 
-			diff -w "${expectedoutdir}/$(basename ${output})" "${output}" > /dev/null
+			diff -w "${expectedoutdir}/$(basename "${output}")" "${output}" > /dev/null
 			diffout=$?
 			if [[ "$diffout" == "1" ]]; then
 				nfailframes=$((nfailframes + 1))
