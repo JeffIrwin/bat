@@ -92,12 +92,12 @@ for i in ${inputs}; do
 	outputs=()
 	if [[ "${#frames[@]}" == "0" ]]; then
 		# No numbered frames, just a single output
-		outputs+=( "${outdir}/${ib%.${inputext}}."${outputext} )
+		outputs+=( "${outdir}/${ib%.${inputext}}." )
 	else
 		for frame in "${frames[@]}"; do
 			# This makes an assumption about where the frame number is in the
 			# filename and how it is delimited.
-			outputs+=( "${outdir}/${ib%.${inputext}}_${frame}."${outputext} )
+			outputs+=( "${outdir}/${ib%.${inputext}}_${frame}." )
 		done
 	fi
 
@@ -106,7 +106,9 @@ for i in ${inputs}; do
 	#echo "d   = $d"
 	#echo ""
 
-	rm "${outputs[@]}"
+	for output in "${outputs[@]}"${outputext}; do
+		rm "${output}"
+	done
 
 	if [[ "$use_pushpop" == "true" ]]; then
 		pushd $d
@@ -137,16 +139,16 @@ for i in ${inputs}; do
 		for output in "${outputs[@]}"; do
 			ntotalframes=$((ntotalframes + 1))
 
-			diff -w "${expectedoutdir}/$(basename "${output}")" "${output}" > /dev/null
+			diff -w "${expectedoutdir}/$(basename "${output}")"${outputext} "${output}"${outputext} > /dev/null
 			diffout=$?
 			if [[ "$diffout" == "1" ]]; then
 				nfailframes=$((nfailframes + 1))
 				failed="true"
-				echo "$this:  error:  difference in ${output}"
+				echo "$this:  error:  difference in ${output}${outputext}"
 			elif [[ "$diffout" != "0" ]]; then
 				nfailframes=$((nfailframes + 1))
 				failed="true"
-				echo "$this:  error:  cannot run diff in ${output}"
+				echo "$this:  error:  cannot run diff in ${output}${outputext}"
 			fi
 
 		done
