@@ -55,3 +55,8 @@ Cleaning and building are trivial one-liners, but the example projects [life](ht
 Q.  Why is this in Bash if it's supposed to be cross-platform?
 
 A.  If you're using git, then you have Bash!  Even on Windows.  BAT is actively used on Linux, macOS, and Windows as part of [github workflows](https://github.com/JeffIrwin/life/blob/master/.github/workflows/main.yml).
+
+
+Q.  Shouldn't I just use a real testing framework?
+
+A.  idk, probably 
