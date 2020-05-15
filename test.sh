@@ -87,16 +87,17 @@ for i in ${inputs}; do
 	ib=$(basename $i)
 	inputext=${ib##*.}
 
+	# Leave outputext outside of quotes as it may contain a glob which needs to
+	# be expanded
 	outputs=()
 	if [[ "${#frames[@]}" == "0" ]]; then
 		# No numbered frames, just a single output
-		outputs+=( "${outdir}/${ib%.${inputext}}.${outputext}" )
+		outputs+=( "${outdir}/${ib%.${inputext}}."${outputext} )
 	else
 		for frame in "${frames[@]}"; do
 			# This makes an assumption about where the frame number is in the
-			# filename and how it is delimited.  For projects like fortfuck, check
-			# if frames is empty and don't use a delimiter.
-			outputs+=( "${outdir}/${ib%.${inputext}}_${frame}.${outputext}" )
+			# filename and how it is delimited.
+			outputs+=( "${outdir}/${ib%.${inputext}}_${frame}."${outputext} )
 		done
 	fi
 
