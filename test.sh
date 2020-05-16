@@ -66,6 +66,7 @@ pwd=$(pwd)
 
 if [[ "$use_python" == "true" ]]; then
 
+	# Run a python program
 	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
 		python="python3"
 	else
@@ -75,6 +76,7 @@ if [[ "$use_python" == "true" ]]; then
 
 else
 
+	# Run a compiled executable
 	if [[ "$use_envpath" == "true" ]]; then
 		# The exe is in the PATH environment variable
 		exe="$exebase"
@@ -135,6 +137,11 @@ for i in ${inputs}; do
 	#echo "ib  = $ib"
 	#echo "d   = $d"
 	#echo ""
+
+	# With $use_localoutdir, the program's output is in the local directories
+	# of each input file.  Otherwise, they may be in a shared directory, or
+	# there may not be any output at all that can be safely removed for this
+	# stage.
 
 	if [[ "$use_localoutdir" != "true" && "$outputext" != "" ]]; then
 		for output in "${outputs[@]}"${outputext}; do
