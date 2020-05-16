@@ -6,21 +6,36 @@ source "${thisdir}/constants.sh"
 source "${thisdir}/os.sh"
 
 use_stdin="${use_stdin:-"true"}"
+use_stdout="${use_stdout:-"false"}"
 use_pushpop="${use_pushpop:-"true"}"
 use_python="${use_python:-"false"}"
+use_envpath="${use_envpath:-"false"}"
+use_exitstat="${use_exitstat:-"true"}"
+use_localoutdir="${use_localoutdir:-"false"}"
 
 dirty="false"
+nobuild="false"
+nodiff="false"
 for arg in "$@" ; do
 	#echo $arg
+
 	if [[ "$arg" == "--dirty" || "$arg" == "-d" ]] ; then
 		dirty="true"
+
+	elif [[ "$arg" == "--no-build" ]] ; then
+		nobuild="true"
+
+	elif [[ "$arg" == "--no-diff" ]] ; then
+		nodiff="true"
+
 	else
 		echo "$this:  warning:  unknown cmd argument '$arg'"
 		echo
 	fi
+
 done
 
-if [[ "$use_python" != "true" ]]; then
+if [[ "$use_python" != "true" && "$nobuild" != "true" ]]; then
 
 	# No CMake for interpreted python
 
@@ -43,36 +58,43 @@ fi
 pwd=$(pwd)
 
 if [[ "$use_python" == "true" ]]; then
+
 	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
 		python="python3"
 	else
 		python="python"
 	fi
 	exe="$python $pwd/$exebase.py"
+
 else
 
-	if [[ $machine == "Linux" || $machine == "Mac" ]]; then
-		exe="$pwd/$build/$exebase"
+	if [[ "$use_envpath" == "true" ]]; then
+		exe="$exebase"
 	else
 
-		if [[ "$use_defaultgen" == "true" ]]; then
-			exe="$pwd/$build/Release/$exebase.exe"
+		if [[ $machine == "Linux" || $machine == "Mac" ]]; then
+			exe="$pwd/$build/$exebase"
 		else
-			exe="$pwd/$build/$exebase.exe"
+
+			if [[ "$use_defaultgen" == "true" ]]; then
+				exe="$pwd/$build/Release/$exebase.exe"
+			else
+				exe="$pwd/$build/$exebase.exe"
+			fi
+
 		fi
 
-	fi
+		if [[ ! -e "$exe" ]]; then
+			echo "$this:  error:  executable \"$exe\" does not exist"
+			exit -2
 
-	if [[ ! -e "$exe" ]]; then
-		echo "$this:  error:  executable \"$exe\" does not exist"
-		exit -2
+		fi
 	fi
-
 fi
 
 echo "==============================================================================="
 echo ""
-echo "$this:  running tests..."
+echo "$this:  running tests with \"${exebase}\" ..."
 echo ""
 
 nfail=0
@@ -106,9 +128,11 @@ for i in ${inputs}; do
 	#echo "d   = $d"
 	#echo ""
 
-	for output in "${outputs[@]}"${outputext}; do
-		rm "${output}"
-	done
+	if [[ "$use_localoutdir" != "true" && "$outputext" != "" ]]; then
+		for output in "${outputs[@]}"${outputext}; do
+			rm "${output}"
+		done
+	fi
 
 	if [[ "$use_pushpop" == "true" ]]; then
 		pushd $d
@@ -117,25 +141,43 @@ for i in ${inputs}; do
 		il=$i
 	fi
 
+	if [[ "$use_localoutdir" == "true" && "$outputext" != "" ]]; then
+		for output in "${outputs[@]}"${outputext}; do
+			rm "${output}"
+		done
+	fi
+
 	ntotal=$((ntotal + 1))
 	failed="false"
 
-	if [[ "$use_stdin" == "true" ]]; then
-		${exe} < "$il"
+	if [[ "$use_stdout" == "true" ]]; then
+
+		if [[ "$use_stdin" == "true" ]]; then
+			${exe} < "$il" > "${outputs[0]}"${outputext}
+		else
+			${exe} "$il" > "${outputs[0]}"${outputext}
+		fi
+
 	else
-		${exe} "$il"
+
+		if [[ "$use_stdin" == "true" ]]; then
+			${exe} < "$il"
+		else
+			${exe} "$il"
+		fi
+
 	fi
 
-	if [[ "$?" != "0" ]]; then
+	if [[ "$?" != "0" && "$use_exitstat" == "true" ]]; then
 		failed="true"
 		echo "$this:  error:  cannot run test $i"
 	fi
 
-	if [[ "$use_pushpop" == "true" ]]; then
+	if [[ "$use_pushpop" == "true" && "$use_localoutdir" != "true" ]]; then
 		popd
 	fi
 
-	if [[ "$failed" != "true" ]]; then
+	if [[ "$failed" != "true" && "$nodiff" != "true" ]]; then
 		for output in "${outputs[@]}"; do
 			ntotalframes=$((ntotalframes + 1))
 
@@ -152,6 +194,10 @@ for i in ${inputs}; do
 			fi
 
 		done
+	fi
+
+	if [[ "$use_pushpop" == "true" && "$use_localoutdir" == "true" ]]; then
+		popd
 	fi
 
 	if [[ "$failed" == "true" ]]; then
