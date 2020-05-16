@@ -5,6 +5,8 @@ thisdir=$(dirname ${BASH_SOURCE[0]})
 source "${thisdir}/constants.sh"
 source "${thisdir}/os.sh"
 
+# These options are passed as environment variables.  They are usually set
+# permanently per-project (or per-stage of a project).
 use_stdin="${use_stdin:-"true"}"
 use_stdout="${use_stdout:-"false"}"
 use_pushpop="${use_pushpop:-"true"}"
@@ -13,6 +15,8 @@ use_envpath="${use_envpath:-"false"}"
 use_exitstat="${use_exitstat:-"true"}"
 use_localoutdir="${use_localoutdir:-"false"}"
 
+# These options are passed as command line arguments.  They can be set or unset
+# per-run for debugging.
 dirty="false"
 nobuild="false"
 nodiff="false"
@@ -20,12 +24,15 @@ for arg in "$@" ; do
 	#echo $arg
 
 	if [[ "$arg" == "--dirty" || "$arg" == "-d" ]] ; then
+		# Rebuild but not from a clean state
 		dirty="true"
 
 	elif [[ "$arg" == "--no-build" ]] ; then
+		# Don't rebuild at all
 		nobuild="true"
 
 	elif [[ "$arg" == "--no-diff" ]] ; then
+		# Run but don't compare outputs for this stage
 		nodiff="true"
 
 	else
@@ -69,6 +76,7 @@ if [[ "$use_python" == "true" ]]; then
 else
 
 	if [[ "$use_envpath" == "true" ]]; then
+		# The exe is in the PATH environment variable
 		exe="$exebase"
 	else
 
@@ -135,9 +143,11 @@ for i in ${inputs}; do
 	fi
 
 	if [[ "$use_pushpop" == "true" ]]; then
+		# Change directories to the location of the input file
 		pushd $d
 		il=$ib
 	else
+		# Run from the top-level directory
 		il=$i
 	fi
 
@@ -151,14 +161,18 @@ for i in ${inputs}; do
 	failed="false"
 
 	if [[ "$use_stdout" == "true" ]]; then
+		# Capture the program's stdout for comparison
 
 		if [[ "$use_stdin" == "true" ]]; then
+			# The program reads from stdin
 			${exe} < "$il" > "${outputs[0]}"${outputext}
 		else
+			# The program reads from a file given as a cmd arg
 			${exe} "$il" > "${outputs[0]}"${outputext}
 		fi
 
 	else
+		# The program writes a file other than stdout which will be compared
 
 		if [[ "$use_stdin" == "true" ]]; then
 			${exe} < "$il"
@@ -169,6 +183,7 @@ for i in ${inputs}; do
 	fi
 
 	if [[ "$?" != "0" && "$use_exitstat" == "true" ]]; then
+		# Check the program's exit status if it is set
 		failed="true"
 		echo "$this:  error:  cannot run test $i"
 	fi
@@ -181,6 +196,7 @@ for i in ${inputs}; do
 		for output in "${outputs[@]}"; do
 			ntotalframes=$((ntotalframes + 1))
 
+			# Compare this run's output to the expected output
 			diff -w "${expectedoutdir}/$(basename "${output}")"${outputext} "${output}"${outputext} > /dev/null
 			diffout=$?
 			if [[ "$diffout" == "1" ]]; then
