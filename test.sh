@@ -144,8 +144,8 @@ for i in ${inputs}; do
 	# stage.
 
 	if [[ "$use_localoutdir" != "true" && "$outputext" != "" ]]; then
-		for output in "${outputs[@]}"${outputext}; do
-			rm "${output}"
+		for output in "${outputs[@]}"; do
+			rm "${output}"${outputext}
 		done
 	fi
 
@@ -159,8 +159,8 @@ for i in ${inputs}; do
 	fi
 
 	if [[ "$use_localoutdir" == "true" && "$outputext" != "" ]]; then
-		for output in "${outputs[@]}"${outputext}; do
-			rm "${output}"
+		for output in "${outputs[@]}"; do
+			rm "${output}"${outputext}
 		done
 	fi
 
