@@ -20,12 +20,17 @@ use_localoutdir="${use_localoutdir:-"false"}"
 dirty="false"
 nobuild="false"
 nodiff="false"
+debug="false"
 for arg in "$@" ; do
 	#echo $arg
 
 	if [[ "$arg" == "--dirty" || "$arg" == "-d" ]] ; then
 		# Rebuild but not from a clean state
 		dirty="true"
+
+	elif [[ "$arg" == "--debug" ]] ; then
+		# Use Debug CMake configuration instead of Release
+		debug="true"
 
 	elif [[ "$arg" == "--no-build" ]] ; then
 		# Don't rebuild at all
@@ -42,6 +47,12 @@ for arg in "$@" ; do
 
 done
 
+if [[ "$debug" == "true" ]]; then
+	config="Debug"
+else
+	config="Release"
+fi
+
 if [[ "$use_python" != "true" && "$nobuild" != "true" ]]; then
 
 	# No CMake for interpreted python
@@ -54,7 +65,7 @@ if [[ "$use_python" != "true" && "$nobuild" != "true" ]]; then
 	fi
 
 	chmod +x "${thisdir}/build.sh"
-	"${thisdir}/build.sh"
+	"${thisdir}/build.sh" $config
 	if [[ "$?" != "0" ]]; then
 		echo "$this:  error:  cannot build"
 		exit -1
@@ -87,7 +98,7 @@ else
 		else
 
 			if [[ "$use_defaultgen" == "true" ]]; then
-				exe="$pwd/$build/Release/$exebase.exe"
+				exe="$pwd/$build/$config/$exebase.exe"
 			else
 				exe="$pwd/$build/$exebase.exe"
 			fi
