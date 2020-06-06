@@ -21,6 +21,7 @@ dirty="false"
 nobuild="false"
 nodiff="false"
 debug="false"
+fatal="false"
 for arg in "$@" ; do
 	#echo $arg
 
@@ -39,6 +40,10 @@ for arg in "$@" ; do
 	elif [[ "$arg" == "--no-diff" ]] ; then
 		# Run but don't compare outputs for this stage
 		nodiff="true"
+
+	elif [[ "$arg" == "--fatal" ]] ; then
+		# Stop after the first failed frame
+		fatal="true"
 
 	else
 		echo "$this:  warning:  unknown cmd argument '$arg'"
@@ -227,6 +232,10 @@ for i in ${inputs}; do
 				echo "$this:  error:  cannot run diff in ${output}${outputext}"
 			fi
 
+			if [[ "$failed" == "true" && "$fatal" == "true" ]]; then
+				break
+			fi
+
 		done
 	fi
 
@@ -237,6 +246,11 @@ for i in ${inputs}; do
 	if [[ "$failed" == "true" ]]; then
 		failedtests+=("$i")
 		nfail=$((nfail + 1))
+
+		if [[ "$fatal" == "true" ]]; then
+			break
+		fi
+
 	fi
 
 done
