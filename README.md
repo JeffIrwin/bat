@@ -3,7 +3,15 @@
 BAT:  a cross-platform Bourne-again testing framework for a novel world rising from the ashes of coronavirus 🦇
 
 ## Usage
-For complete projects that use the BAT framework, see [life](https://github.com/JeffIrwin/life) or [mandelbrotZoom](https://github.com/JeffIrwin/mandelbrotZoom).
+For complete projects that use the BAT framework, see any of these:
+- [colormapper](https://github.com/JeffIrwin/colormapper) (C++)
+- [fortfuck](https://github.com/JeffIrwin/fortfuck) (Brainfuck and Fortran)
+- [life](https://github.com/JeffIrwin/life) (Fortran)
+- [mandelbrotZoom](https://github.com/JeffIrwin/mandelbrotZoom) (Fortran)
+- [maph](https://github.com/JeffIrwin/maph) (C++)
+- [music-of-the-sars](https://github.com/JeffIrwin/music-of-the-sars) (Python)
+- [pnmio](https://github.com/JeffIrwin/pnmio) (Fortran)
+
 
 ### Building
 Before you test, you have to build, right?  BAT automatically builds for you using CMake before testing, but you can also build independently from testing.  From the parent repo, run:
@@ -13,7 +21,7 @@ Before you test, you have to build, right?  BAT automatically builds for you usi
 In accordance with CMake rules, there needs to be a `CMakeLists.txt` file in the root of the parent repo.
 
 ### Testing
-BAT is designed to test programs that take an *input file*, do some transformative magic in a black box, and then create one or more *output files*.  BAT needs to know where these inputs and outputs are, and what your program is named.  To figure out if the tests passed, BAT also needs to know what you expect the output to be.  Define these variables in the Bash environment, for example:
+BAT is designed to test programs that take an *input file*, do some transformative magic in an opaque box, and then create one or more *output files*.  BAT needs to know where these inputs and outputs are, and what your program is named.  To figure out if the tests passed, BAT also needs to know what you expect the output to be.  Define these variables in the Bash environment, for example:
 
     inputs=./inputs/*.json
     frames=( 2 10 99 )
@@ -48,13 +56,18 @@ Sometimes you can't be sure unless you remove the old build first.  From the par
 
 Want to test quickly without cleaning?  Run `test.sh --dirty` or `test.sh -d`.
 
-Cleaning and building are trivial one-liners, but the example projects [life](https://github.com/JeffIrwin/life) and [mandelbrotZoom](https://github.com/JeffIrwin/mandelbrotZoom) still provide wrapper scripts for these actions, as well as testing.
+Cleaning and building are trivial one-liners, but the example projects listed above, including [life](https://github.com/JeffIrwin/life), still provide wrapper scripts for these actions, as well as testing.
 
 ## FAQ
 
 Q.  Why is this in Bash if it's supposed to be cross-platform?
 
 A.  If you're using git, then you have Bash!  Even on Windows.  BAT is actively used on Linux, macOS, and Windows as part of [github workflows](https://github.com/JeffIrwin/life/blob/master/.github/workflows/main.yml).
+
+
+Q.  What languages can BAT be used to test?
+
+A.  The examples cover compiled languages like C++ and Fortran, and interpretted languages like Python.  However, it can be adapted or used as-is for just about anything that can produce a program with a [CLI](https://en.wikipedia.org/wiki/Command-line_interface).  The [fortfuck](https://github.com/JeffIrwin/fortfuck) project even includes several stages of testing, which run the fortfuck compiler, gcc, and compiled brainfuck executables.
 
 
 Q.  Shouldn't I just use a real testing framework?
