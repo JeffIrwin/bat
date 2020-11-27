@@ -128,6 +128,7 @@ ntotal=0
 nfailframes=0
 ntotalframes=0
 failedtests=()
+idx=0
 
 for i in ${inputs}; do
 
@@ -188,19 +189,19 @@ for i in ${inputs}; do
 
 		if [[ "$use_stdin" == "true" ]]; then
 			# The program reads from stdin
-			${exe} < "$il" > "${outputs[0]}"${outputext}
+			${exe} ${args[$idx]} < "$il" > "${outputs[0]}"${outputext}
 		else
 			# The program reads from a file given as a cmd arg
-			${exe} "$il" > "${outputs[0]}"${outputext}
+			${exe} ${args[$idx]} "$il" > "${outputs[0]}"${outputext}
 		fi
 
 	else
 		# The program writes a file other than stdout which will be compared
 
 		if [[ "$use_stdin" == "true" ]]; then
-			${exe} < "$il"
+			${exe} ${args[$idx]} < "$il"
 		else
-			${exe} "$il"
+			${exe} ${args[$idx]} "$il"
 		fi
 
 	fi
@@ -252,6 +253,9 @@ for i in ${inputs}; do
 		fi
 
 	fi
+
+	# For array indexing (zero-based).  ntotal off by one.
+	idx=$((idx + 1))
 
 done
 
