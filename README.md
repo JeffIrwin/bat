@@ -11,7 +11,7 @@ For complete projects that use the BAT framework, see any of these:
 - [maph](https://github.com/JeffIrwin/maph) (C++)
 - [music-of-the-sars](https://github.com/JeffIrwin/music-of-the-sars) (Python)
 - [pnmio](https://github.com/JeffIrwin/pnmio) (Fortran)
-
+- [rubik](https://github.com/JeffIrwin/rubik) (Fortran)
 
 ### Building
 Before you test, you have to build, right?  BAT automatically builds for you using CMake before testing, but you can also build independently from testing.  From the parent repo, run:
